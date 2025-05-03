@@ -55,18 +55,12 @@ action-recognition-vit
    ```
 
 3. **Running the Web Interface**: 
-   To start the web application, execute:
+
+   You can also use a standalone Streamlit app for visualizing predictions, training logs, and loss curves.
 
    ```bash
-   python src/web/app.py
-   ```
-
-   Then, navigate to `http://127.0.0.1:5000` in your web browser to upload videos and view classification results.
-
+   streamlit run app.py
 ## Contributing
 
 Contributions are welcome! Please feel free to submit a pull request or open an issue for any suggestions or improvements.
 
-## License
-
-This project is licensed under the MIT License. See the LICENSE file for details.
