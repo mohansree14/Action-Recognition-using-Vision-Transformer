@@ -3,16 +3,16 @@ from sklearn.metrics import confusion_matrix, accuracy_score, classification_rep
 import seaborn as sns
 import matplotlib.pyplot as plt
 import logging
-from models.vit import load_vit_model
+from models.timesformer import load_timesformer_model
 from training.dataset import get_dataloader
-
+import os
 # Configure logging
 logging.basicConfig(filename='evaluation.log', level=logging.INFO, 
                     format='%(asctime)s - %(levelname)s - %(message)s')
 
 def evaluate_model(data_dir, batch_size=8):
     _, val_loader = get_dataloader(data_dir, batch_size)
-    extractor, model = load_vit_model()
+    extractor, model = load_timesformer_model()
     model.eval()
 
     all_preds = []
@@ -41,6 +41,7 @@ def evaluate_model(data_dir, batch_size=8):
     # Confusion Matrix
     cm = confusion_matrix(y_true, y_pred)
     sns.heatmap(cm, annot=True, fmt="d")
+    plt.savefig("heatmap.png")
     plt.show()
 
     # Classification report
@@ -61,7 +62,8 @@ def evaluate_model(data_dir, batch_size=8):
     plt.title("Precision-Recall Curve")
     plt.xlabel("Recall")
     plt.ylabel("Precision")
+    plt.savefig("eval.png")
     plt.show()
 
 if __name__ == "__main__":
-    evaluate_model(data_dir="/content/HMDB_simp", batch_size=8)
+    evaluate_model(data_dir="/user/HS402/zs00774/Downloads/HMDB_simp", batch_size=8)

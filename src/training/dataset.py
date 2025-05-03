@@ -26,13 +26,12 @@ class HMDBDataset(Dataset):
                 continue
             for video_folder in os.listdir(action_path):
                 video_path = os.path.join(action_path, video_folder)
-                if os.path.isdir(video_path):  # Ensure it's a folder containing images
-                    all_frames = sorted(os.listdir(video_path))
-                    sampled_frames = all_frames[::self.frame_rate]
-                    if len(sampled_frames) >= self.clip_size:  # Only include valid folders
-                        data.append((video_path, label))
-                    else:
-                        print(f"Skipping {video_path}: Not enough frames. Expected at least {self.clip_size}, got {len(sampled_frames)}.")
+                if os.path.isdir(video_path):
+                    all_frames = os.listdir(video_path)
+                    if len(all_frames) < self.clip_size:
+                        print(f"Skipping {video_path}: Fewer than {self.clip_size} frames.")
+                        continue
+                    data.append((video_path, label))
         return data
 
     def __len__(self):
@@ -50,19 +49,16 @@ class HMDBDataset(Dataset):
         Load frames from a video folder, sampling at a rate of 1/32 to create a clip of size 8.
         """
         all_frames = sorted(os.listdir(video_path))  # Sort to maintain frame order
-        sampled_frames = all_frames[::self.frame_rate]  # Sample frames at a rate of 1/32
+        sampled_frames = all_frames[:self.clip_size]  # Take the first `clip_size` frames directly
 
-        # Pad frames if there are not enough
+        # Ensure the folder has enough frames
         if len(sampled_frames) < self.clip_size:
-            print(f"Padding {video_path}: Not enough frames. Expected at least {self.clip_size}, got {len(sampled_frames)}.")
-            while len(sampled_frames) < self.clip_size:
-                sampled_frames.append(sampled_frames[-1])  # Repeat the last frame
+            raise ValueError(f"{video_path} has fewer than {self.clip_size} frames. Preprocessing might not be complete.")
 
-        # Select the first `clip_size` frames
-        selected_frames = sampled_frames[:self.clip_size]
+        #print(f"Processing {video_path}: {len(all_frames)} total frames, {len(sampled_frames)} sampled frames.")
 
         # Load the selected frames as PIL images
-        frames = [Image.open(os.path.join(video_path, frame)) for frame in selected_frames]
+        frames = [Image.open(os.path.join(video_path, frame)) for frame in sampled_frames]
         return frames
 
 def get_dataloader(root_dir, batch_size=8, clip_size=8, split_ratio=0.8):
