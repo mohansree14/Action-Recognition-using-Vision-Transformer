@@ -15,11 +15,11 @@ import matplotlib.pyplot as plt  # Import matplotlib for plotting
 st.set_page_config(layout="wide", page_title="Action Recognition")
 
 # Sidebar
-st.sidebar.write("## Upload and Process Video 🎥")
+st.sidebar.write("## Upload and Process Video ")
 uploaded_file = st.sidebar.file_uploader("Upload a video file:", type=["mp4", "avi", "mov"])
 
 # Sidebar Information
-with st.sidebar.expander("ℹ️ Video Guidelines"):
+with st.sidebar.expander("ℹ Video Guidelines"):
     st.write("""
     - Supported formats: MP4, AVI, MOV
     - Ensure the video contains clear actions for better predictions
@@ -32,7 +32,7 @@ def download_model_if_needed(save_path):
         file_id = "1yegsjiRVRtXpLfaIpisNPSX6B931sbTG"
         url = f"https://drive.google.com/uc?id={file_id}"
         gdown.download(url, save_path, quiet=False)
-        st.success("✅ Model downloaded successfully!")
+        st.success(" Model downloaded successfully!")
 
 @st.cache_resource
 def load_model():
