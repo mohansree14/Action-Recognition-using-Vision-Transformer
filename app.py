@@ -4,7 +4,6 @@ import numpy as np  # Corrected import statement
 import os
 import cv2
 import tempfile
-import gdown
 import pandas as pd
 import altair as alt
 import re  # Import the re module for regular expressions
@@ -15,36 +14,25 @@ import matplotlib.pyplot as plt  # Import matplotlib for plotting
 st.set_page_config(layout="wide", page_title="Action Recognition")
 
 # Sidebar
-st.sidebar.write("## Upload and Process Video ")
+st.sidebar.write("## Upload and Process Video 🎥")
 uploaded_file = st.sidebar.file_uploader("Upload a video file:", type=["mp4", "avi", "mov"])
 
 # Sidebar Information
-with st.sidebar.expander("ℹ Video Guidelines"):
+with st.sidebar.expander("ℹ️ Video Guidelines"):
     st.write("""
     - Supported formats: MP4, AVI, MOV
     - Ensure the video contains clear actions for better predictions
     """)
 
-def download_model_if_needed(save_path):
-    if not os.path.exists(save_path):
-        st.info("Downloading model from Google Drive...")
-        # This is your actual shared model file ID from Google Drive
-        file_id = "1yegsjiRVRtXpLfaIpisNPSX6B931sbTG"
-        url = f"https://drive.google.com/uc?id={file_id}"
-        gdown.download(url, save_path, quiet=False)
-        st.success(" Model downloaded successfully!")
-
+# Load model
 @st.cache_resource
 def load_model():
-    model_path = "timesformer_model.pth"
-    download_model_if_needed(model_path)
-
     model = AutoModelForVideoClassification.from_pretrained("facebook/timesformer-base-finetuned-k400")
-    model.classifier = torch.nn.Linear(model.config.hidden_size, 25)  # adjust to match your dataset class count
-    model.load_state_dict(torch.load(model_path, map_location=torch.device("cpu")))
     extractor = AutoFeatureExtractor.from_pretrained("facebook/timesformer-base-finetuned-k400")
     return model, extractor
 
+model, extractor = load_model()
+model.eval()
 
 # Function to extract frames from a video
 def extract_frames_from_video(video_path, output_folder, num_frames=8):
@@ -190,3 +178,4 @@ try:
         st.warning(f"Training log file not found. Please ensure the file exists at '{log_file_path}'.")
 except Exception as e:
     st.warning(f"An error occurred while reading the training log: {str(e)}")
+
